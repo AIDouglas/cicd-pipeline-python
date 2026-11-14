@@ -1,8 +1,15 @@
 # app/app.py
+import os
+import secrets
+
 from flask import Flask, render_template, request
+from flask_wtf import CSRFProtect
+
 from .calculadora import sumar, restar, multiplicar, dividir
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", secrets.token_hex(32))
+csrf = CSRFProtect(app)
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -33,4 +40,5 @@ def index():
 
 
 if __name__ == "__main__":  # pragma: no cover
-    app.run(debug=True, port=5000, host="0.0.0.0")  # Quita debug=True para producción
+    debug_mode = os.environ.get("FLASK_DEBUG", "0") == "1"
+    app.run(debug=debug_mode, port=5000, host="127.0.0.1")
